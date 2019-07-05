@@ -546,7 +546,7 @@ var MprisIndicatorButton = GObject.registerClass({
         this.menu.actor.add_style_class_name("aggregate-menu");
         this.menu.box.set_layout_manager(new Panel.AggregateLayout());
 
-        this.hide();
+        this.hide_all();
 
         let label = new St.Label({});
         label.text = 'hello';
@@ -630,16 +630,18 @@ var MprisIndicatorButton = GObject.registerClass({
             let player = this._getLastActivePlayer();
             indicator.gicon = player ? player.gicon : null;
             indicator.set_icon_size(16);
-            if (player._mpris) {
+            if (player && player._mpris) {
                 player._mpris.connect('notify', (mpris, pspec) => {
                     if (pspec.get_name() === 'title' || pspec.get_name() === 'artist') {
                         label.text = `${player._mpris._artist} — ${player._mpris._title}`;
                     }
                 });
             } else {
-                log("player._mpris is not an object ¯\_(ツ)_/¯");
+                log("player or player._mpris is not an object ¯\_(ツ)_/¯");
             }
             this.visible = indicator.gicon ? true : false;
+            indicator.visible = indicator.gicon ? true : false;
+            label.visible = indicator.gicon ? true : false;
         };
 
         let proxyHandler = new DBus.DBusProxyHandler();
