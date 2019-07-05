@@ -548,12 +548,23 @@ var MprisIndicatorButton = GObject.registerClass({
 
         this.hide();
 
+        let label = new St.Label({});
+        label.text = 'hello';
+
+        let hbox = new St.BoxLayout({
+            y_align: Clutter.ActorAlign.CENTER,
+            accessible_role: Atk.Role.INTERNAL_FRAME,
+            x_expand: true
+        });
+
         let indicator = new St.Icon({
             accessible_role: Atk.Role.ICON,
             style_class: "system-status-icon"
         })
 
-        this.add_child(indicator);
+        hbox.add(indicator);
+        hbox.add(label);
+        this.add_child(hbox);
 
         let signals = [];
 
@@ -618,6 +629,16 @@ var MprisIndicatorButton = GObject.registerClass({
         let updateIndicator = () => {
             let player = this._getLastActivePlayer();
             indicator.gicon = player ? player.gicon : null;
+            indicator.set_icon_size(16);
+            if (player._mpris) {
+                player._mpris.connect('notify', (mpris, pspec) => {
+                    if (pspec.get_name() === 'title' || pspec.get_name() === 'artist') {
+                        label.text = `${player._mpris._artist} — ${player._mpris._title}`;
+                    }
+                });
+            } else {
+                log("player._mpris is not an object ¯\_(ツ)_/¯");
+            }
             this.visible = indicator.gicon ? true : false;
         };
 
