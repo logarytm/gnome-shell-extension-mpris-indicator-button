@@ -282,7 +282,7 @@ var VolumeSlider = GObject.registerClass({
             this.toggleMute();
         });
 
-        pushSignal(this._slider, "value-changed", () => {
+        pushSignal(this._slider, "notify::value", () => {
             this.value = this._slider._value;
         });
 
@@ -314,7 +314,7 @@ var VolumeSlider = GObject.registerClass({
                 ? 1
                 : 2;
             this._button.child.icon_name = VOULME_ICONS[iconIndex];
-            this._slider.setValue(newValue);
+            this._slider.value = newValue;
             this._value = newValue;
             this.notify("value");
             this.show();

@@ -60,9 +60,10 @@ function disable() {
     }
 }
 
+var Player = GObject.registerClass(
 class Player extends PopupMenu.PopupBaseMenuItem {
-    constructor(mpris, updateIndicator) {
-        super();
+    _init(mpris, updateIndicator) {
+        super._init();
         this._mpris = null;
 
         let vbox = new St.BoxLayout({
@@ -283,6 +284,7 @@ class Player extends PopupMenu.PopupBaseMenuItem {
             }
         });
 
+        log(typeof this.setMpris);
         this.setMpris(mpris, updateIndicator);
     }
 
@@ -535,7 +537,7 @@ class Player extends PopupMenu.PopupBaseMenuItem {
             volumeSlider.toggleMute();
         };
     }
-}
+});
 
 var MprisIndicatorButton = GObject.registerClass({
     GTypeName: "MprisIndicatorButton"
@@ -633,11 +635,18 @@ var MprisIndicatorButton = GObject.registerClass({
             if (player && player._mpris) {
                 player._mpris.connect('notify', (mpris, pspec) => {
                     if (pspec.get_name() === 'title' || pspec.get_name() === 'artist') {
-                        label.text = `${player._mpris._artist} — ${player._mpris._title}`;
+                        let title = player._mpris._title;
+                        let artist = player._mpris._artist;
+
+                        if (artist.match(/^\s*$/)) {
+                            label.text = title;
+                        } else if (title.match(/^\s*$/)) {
+                            label.text = artist;
+                        } else {
+                            label.text = `${player._mpris._title} by ${player._mpris._artist}`;
+                        }
                     }
                 });
-            } else {
-                log("player or player._mpris is not an object ¯\_(ツ)_/¯");
             }
             this.visible = indicator.gicon ? true : false;
             indicator.visible = indicator.gicon ? true : false;
