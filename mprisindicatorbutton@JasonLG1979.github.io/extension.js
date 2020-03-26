@@ -548,15 +548,19 @@ var MprisIndicatorButton = GObject.registerClass({
         this.menu.actor.add_style_class_name("aggregate-menu");
         this.menu.box.set_layout_manager(new Panel.AggregateLayout());
 
-        this.hide_all();
+        // this.hide_all();
 
-        let label = new St.Label({});
-        label.text = 'hello';
+        let label = new St.Label({
+            y_expand: true,
+            y_align: Clutter.ActorAlign.CENTER 
+        });
+        label.text = 'not playing';
 
         let hbox = new St.BoxLayout({
             y_align: Clutter.ActorAlign.CENTER,
             accessible_role: Atk.Role.INTERNAL_FRAME,
-            x_expand: true
+            x_expand: true,
+            y_expand: true
         });
 
         let indicator = new St.Icon({
@@ -635,8 +639,8 @@ var MprisIndicatorButton = GObject.registerClass({
             if (player && player._mpris) {
                 player._mpris.connect('notify', (mpris, pspec) => {
                     if (pspec.get_name() === 'title' || pspec.get_name() === 'artist') {
-                        let title = player._mpris._title;
-                        let artist = player._mpris._artist;
+                        let title = player._mpris._title || '';
+                        let artist = player._mpris._artist || '';
 
                         if (artist.match(/^\s*$/)) {
                             label.text = title;
